@@ -36,7 +36,7 @@ const App: FC = () => {
       </div>
 
       {/* Кнопки для навигации между вопросами */}
-      <div style={{ marginTop: '20px' }}>
+      <div style={{ display: 'flex', gap: 16, marginTop: '20px' }}>
         <button onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
           Назад
         </button>
