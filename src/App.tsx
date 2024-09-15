@@ -1,51 +1,21 @@
-import { FC, useState } from 'react';
-import QuestionComponent from './components/question';
-import { data } from './data.ts';
+import { FC } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { MainPage } from './pages/main-page.tsx';
+import { TopicsListPage } from './pages/topics-list-page.tsx';
+import { TopicQuestionsPage } from './pages/topic-questions-page.tsx';
 
-const App: FC = () => {
-  // Состояние для текущего индекса вопроса
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <MainPage />,
+  },
+  { path: 'topics', element: <TopicsListPage /> },
+  {
+    path: 'topics/:topicNumber',
+    element: <TopicQuestionsPage />,
+  },
+]);
 
-  // Функция для перехода к следующему вопросу
-  const handleNext = () => {
-    if (currentQuestionIndex < data.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
-  };
-
-  // Функция для перехода к предыдущему вопросу
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-
-  return (
-    <div
-      style={{
-        padding: 24,
-      }}
-    >
-      <h2>
-        Тема № 2. Топография грудной клетки и органов грудной полости. Операции на грудной клетке и
-        органах грудной полости
-      </h2>
-      {/* Рендер текущего вопроса */}
-      <div style={{ marginTop: 40 }}>
-        <QuestionComponent key={currentQuestionIndex} question={data[currentQuestionIndex]} />
-      </div>
-
-      {/* Кнопки для навигации между вопросами */}
-      <div style={{ display: 'flex', gap: 16, marginTop: '20px' }}>
-        <button onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
-          Назад
-        </button>
-        <button onClick={handleNext} disabled={currentQuestionIndex === data.length - 1}>
-          Вперед
-        </button>
-      </div>
-    </div>
-  );
-};
+const App: FC = () => <RouterProvider router={router} />;
 
 export default App;

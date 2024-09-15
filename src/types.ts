@@ -9,3 +9,9 @@ export interface IQuestion {
   options: IOption[];
   rightAnswers: string[];
 }
+
+export interface ITopic {
+  number: number;
+  title: string;
+  questions: IQuestion[];
+}
