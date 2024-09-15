@@ -1,7 +1,6 @@
 import { FC, useState } from 'react';
 import { IQuestion } from '../types';
 import { Button, Checkbox, FormControlLabel, FormGroup } from '@mui/material';
-import { Link } from 'react-router-dom';
 
 interface QuestionProps {
   question: IQuestion;
