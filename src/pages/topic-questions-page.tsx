@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import QuestionComponent from '../components/question.tsx';
-import { data } from '../data.ts';
+import { data } from '../data';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';

@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { data } from '../data.ts';
+import { data } from '../data';
 import { Link } from 'react-router-dom';
 
 export const TopicsListPage: FC = () => {
