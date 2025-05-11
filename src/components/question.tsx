@@ -1,5 +1,5 @@
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { IQuestion, IQuestionHandlers } from '../types';
 
 interface IQuestionProps {
@@ -7,10 +7,14 @@ interface IQuestionProps {
 }
 
 export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
-  ({ question: { number, question, options, rightAnswers } }, ref) => {
+  ({ question }, ref) => {
     const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
     const [showResult, setShowResult] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+
+    const { number, question: text, options, rightAnswers } = question;
+
+    const randomOptions = useMemo(() => options.slice().sort(() => Math.random() - 0.5), [options]);
 
     const handleCheckboxChange = (id: string) => {
       setErrorMessage('');
@@ -42,12 +46,12 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
       <div>
         <div style={{ marginBottom: '20px' }}>
           <h4>
-            {number}. {question}
+            {number}. {text}
           </h4>
         </div>
 
         <FormGroup>
-          {options.map((option) => (
+          {randomOptions.map((option) => (
             <FormControlLabel
               key={option.id}
               control={
