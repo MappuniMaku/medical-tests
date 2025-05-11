@@ -1,6 +1,6 @@
-import { ITopic } from '../types.ts';
+import { ITopic } from '../../types';
 
-export const topic3: ITopic = {
+export const topka3: ITopic = {
   number: 3,
   title:
     'Топография передней брюшной стенки. Хирургическая анатомия грыж. Топография органов брюшной полости',

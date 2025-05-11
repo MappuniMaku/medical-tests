@@ -1,6 +1,6 @@
-import { ITopic } from '../types.ts';
+import { ITopic } from '../../types';
 
-export const topic5: ITopic = {
+export const topka5: ITopic = {
   number: 5,
   title:
     'Топография поясничной области и забрюшинного пространства. Операции на органах забрюшинного пространства',

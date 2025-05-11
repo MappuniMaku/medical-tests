@@ -1,6 +1,6 @@
-import { ITopic } from '../types.ts';
+import { ITopic } from '../../types';
 
-export const topic2: ITopic = {
+export const topka2: ITopic = {
   number: 2,
   title:
     'Топография грудной клетки и органов грудной полости. Операции на грудной клетке и органах грудной полости',

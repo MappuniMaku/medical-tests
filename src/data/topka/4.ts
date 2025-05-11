@@ -1,6 +1,6 @@
-import { ITopic } from '../types.ts';
+import { ITopic } from '../../types';
 
-export const topic4: ITopic = {
+export const topka4: ITopic = {
   number: 4,
   title: 'Операции на органах брюшной полости',
   questions: [

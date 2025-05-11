@@ -15,3 +15,13 @@ export interface ITopic {
   title: string;
   questions: IQuestion[];
 }
+
+export interface ISubject {
+  id: string;
+  title: string;
+  topics: ITopic[];
+}
+
+export interface IQuestionHandlers {
+  handleAnswer: () => void;
+}

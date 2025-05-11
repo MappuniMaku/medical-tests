@@ -1,15 +1,29 @@
 import { FC } from 'react';
-import { data } from '../data';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { BackButton, NotFound } from '../components';
+import { subjects } from '../data';
 
 export const TopicsListPage: FC = () => {
+  const { subject } = useParams();
+
+  const targetSubject = subjects.find((item) => item.id === subject);
+
+  if (targetSubject === undefined) {
+    return <NotFound />;
+  }
+
+  const { id, title, topics } = targetSubject;
+
   return (
     <div>
-      <h2 style={{ marginBottom: 24 }}>Список тем</h2>
+      <div style={{ marginBottom: 16 }}>
+        <BackButton link="/" text="На главную" />
+      </div>
+      <h2 style={{ marginBottom: 24 }}>{title}</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {data.map(({ number, title }) => (
+        {topics.map(({ number, title }) => (
           <div key={number}>
-            <Link to={`/topics/${number}`}>
+            <Link to={`/subjects/${id}/topics/${number}`}>
               {number}. {title}
             </Link>
           </div>

@@ -1,21 +1,17 @@
 import { FC } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { MainPage } from './pages/main-page.tsx';
-import { TopicsListPage } from './pages/topics-list-page.tsx';
-import { TopicQuestionsPage } from './pages/topic-questions-page.tsx';
+import { MainPage, TopicQuestionsPage, TopicsListPage } from './pages';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <MainPage />,
   },
-  { path: 'topics', element: <TopicsListPage /> },
+  { path: 'subjects/:subject', element: <TopicsListPage /> },
   {
-    path: 'topics/:topicNumber',
+    path: 'subjects/:subject/topics/:topic',
     element: <TopicQuestionsPage />,
   },
 ]);
 
-const App: FC = () => <RouterProvider router={router} />;
-
-export default App;
+export const App: FC = () => <RouterProvider router={router} />;
