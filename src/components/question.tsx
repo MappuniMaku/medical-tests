@@ -25,18 +25,19 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
       }
     };
 
-    const handleSubmit = () => {
+    const isCorrect = (id: string) => rightAnswers.includes(id);
+    const isSelected = (id: string) => selectedAnswers.includes(id);
+
+    const handleSubmit = (): boolean | undefined => {
       if (selectedAnswers.length === 0) {
         setErrorMessage('Нужно выбрать хотя бы 1 вариант');
         setShowResult(false);
       } else {
         setErrorMessage('');
         setShowResult(true);
+        return selectedAnswers.length === rightAnswers.length && selectedAnswers.every(isCorrect);
       }
     };
-
-    const isCorrect = (id: string) => rightAnswers.includes(id);
-    const isSelected = (id: string) => selectedAnswers.includes(id);
 
     useImperativeHandle(ref, () => ({
       handleAnswer: handleSubmit,

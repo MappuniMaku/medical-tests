@@ -1,10 +1,10 @@
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { Button, colors, Tooltip } from '@mui/material';
-import { FC, useRef, useState } from 'react';
+import { FC, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BackButton, NotFound, QuestionComponent } from '../components';
 import { subjects } from '../data';
-import { IQuestionHandlers } from '../types';
+import { IQuestionHandlers, IResults, IResultsSummary } from '../types';
 
 export const TopicQuestionsPage: FC = () => {
   const { subject, topic } = useParams();
@@ -13,8 +13,29 @@ export const TopicQuestionsPage: FC = () => {
   const targetTopic = targetSubject?.topics.find((item) => item.number === Number(topic));
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [results, setResults] = useState<IResults>({});
 
   const questionRef = useRef<IQuestionHandlers>(null);
+
+  const { correct, wrong, total } = useMemo(() => {
+    const answers = Object.values(results);
+    return answers.reduce<IResultsSummary>(
+      (acc, isCorrect) => {
+        if (isCorrect) {
+          acc.correct += 1;
+        } else {
+          acc.wrong += 1;
+        }
+
+        return acc;
+      },
+      {
+        correct: 0,
+        wrong: 0,
+        total: answers.length,
+      },
+    );
+  }, [results]);
 
   if (targetSubject === undefined || targetTopic === undefined) {
     return <NotFound />;
@@ -35,13 +56,31 @@ export const TopicQuestionsPage: FC = () => {
   };
 
   const handleAnswer = () => {
-    questionRef.current?.handleAnswer();
+    const isCorrectAnswer = questionRef.current?.handleAnswer();
+
+    if (isCorrectAnswer === undefined) {
+      return;
+    }
+
+    setResults((prevState) => ({ ...prevState, [currentQuestionIndex]: isCorrectAnswer }));
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ marginBottom: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}
+      >
         <BackButton link={`/subjects/${targetSubject.id}`} text={targetSubject.title} />
+        <div>
+          <span style={{ color: 'green' }}>{correct}</span>/
+          <span style={{ color: 'red' }}>{wrong}</span>/
+          <span style={{ color: 'gray' }}>{total}</span>
+        </div>
       </div>
       <Tooltip title={title} arrow>
         <h3

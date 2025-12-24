@@ -23,5 +23,13 @@ export interface ISubject {
 }
 
 export interface IQuestionHandlers {
-  handleAnswer: () => void;
+  handleAnswer: () => boolean | undefined;
+}
+
+export type IResults = Record<number, boolean>;
+
+export interface IResultsSummary {
+  correct: number;
+  wrong: number;
+  total: number;
 }
