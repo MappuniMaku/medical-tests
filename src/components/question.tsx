@@ -1,18 +1,21 @@
-import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { Checkbox, FormControlLabel, FormGroup, MenuItem, Select } from '@mui/material';
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
-import { IQuestion, IQuestionHandlers } from '../types';
+import { IQuestion, IQuestionHandlers, IResults } from '../types';
 
 interface IQuestionProps {
-  question: IQuestion;
+  questions: IQuestion[];
+  currentQuestionIndex: number;
+  results: IResults;
+  setCurrentQuestionIndex: (index: number) => void;
 }
 
 export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
-  ({ question }, ref) => {
+  ({ questions, currentQuestionIndex, results, setCurrentQuestionIndex }, ref) => {
     const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
     const [showResult, setShowResult] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const { number, question: text, options, rightAnswers } = question;
+    const { options, rightAnswers } = questions[currentQuestionIndex];
 
     const randomOptions = useMemo(() => options.slice().sort(() => Math.random() - 0.5), [options]);
 
@@ -45,11 +48,49 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
 
     return (
       <div>
-        <div style={{ marginBottom: '20px' }}>
-          <h4>
-            {number}. {text}
-          </h4>
-        </div>
+        <Select
+          variant="outlined"
+          value={currentQuestionIndex}
+          sx={{
+            '& .MuiSelect-select.MuiInputBase-input': {
+              whiteSpace: 'normal',
+              lineHeight: 1.3,
+              py: 1.5,
+            },
+          }}
+          onChange={(e) => setCurrentQuestionIndex(Number(e.target.value))}
+        >
+          {questions.map((item) => {
+            const id = item.number - 1;
+            return (
+              <MenuItem
+                key={id}
+                value={id}
+                sx={{
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                }}
+              >
+                <span>
+                  <span
+                    style={
+                      results[id] !== undefined
+                        ? {
+                            outlineWidth: 2,
+                            outlineStyle: 'solid',
+                            outlineColor: results[id] ? 'green' : 'red',
+                          }
+                        : undefined
+                    }
+                  >
+                    {item.number}.
+                  </span>{' '}
+                  {item.question}
+                </span>
+              </MenuItem>
+            );
+          })}
+        </Select>
 
         <FormGroup>
           {randomOptions.map((option) => (

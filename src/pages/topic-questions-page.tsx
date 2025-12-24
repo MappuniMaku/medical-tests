@@ -94,11 +94,14 @@ export const TopicQuestionsPage: FC = () => {
           Тема № {number}. {title}
         </h3>
       </Tooltip>
-      <div style={{ marginTop: 24 }}>
+      <div style={{ marginTop: 12 }}>
         <QuestionComponent
           key={currentQuestionIndex}
           ref={questionRef}
-          question={questions[currentQuestionIndex]}
+          questions={questions}
+          currentQuestionIndex={currentQuestionIndex}
+          results={results}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
         />
       </div>
       <div
