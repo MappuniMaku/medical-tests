@@ -116,8 +116,6 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
               style={{
                 maxWidth: '100%',
                 display: 'block',
-                opacity: imageLoaded ? 1 : 0,
-                transition: 'opacity 3s',
               }}
             />
           </div>
