@@ -15,7 +15,7 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
     const [showResult, setShowResult] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const { options, rightAnswers } = questions[currentQuestionIndex];
+    const { options, rightAnswers, image } = questions[currentQuestionIndex];
 
     const randomOptions = useMemo(() => options.slice().sort(() => Math.random() - 0.5), [options]);
 
@@ -92,6 +92,14 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
           })}
         </Select>
 
+        {image && (
+          <img
+            src={image}
+            alt=""
+            style={{ maxWidth: '100%', margin: '12px 0', display: 'block' }}
+          />
+        )}
+
         <FormGroup>
           {randomOptions.map((option) => (
             <FormControlLabel
@@ -103,7 +111,7 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
                   onChange={() => handleCheckboxChange(option.id)}
                 />
               }
-              label={option.value}
+              label={<span style={{ whiteSpace: 'pre-wrap' }}>{option.value}</span>}
               style={{
                 color: showResult
                   ? isSelected(option.id)

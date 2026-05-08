@@ -6,6 +6,7 @@ export interface IOption {
 export interface IQuestion {
   number: number;
   question: string;
+  image?: string;
   options: IOption[];
   rightAnswers: string[];
 }
