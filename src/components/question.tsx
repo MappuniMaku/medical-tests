@@ -1,5 +1,5 @@
 import { Checkbox, FormControlLabel, FormGroup, MenuItem, Select } from '@mui/material';
-import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useState, useEffect } from 'react';
 import { IQuestion, IQuestionHandlers, IResults } from '../types';
 
 interface IQuestionProps {
@@ -14,8 +14,13 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
     const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
     const [showResult, setShowResult] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     const { options, rightAnswers, image } = questions[currentQuestionIndex];
+
+    useEffect(() => {
+      setImageLoaded(false);
+    }, [image]);
 
     const randomOptions = useMemo(() => options.slice().sort(() => Math.random() - 0.5), [options]);
 
@@ -93,11 +98,29 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
         </Select>
 
         {image && (
-          <img
-            src={image}
-            alt=""
-            style={{ maxWidth: '100%', margin: '12px 0', display: 'block' }}
-          />
+          <div
+            style={{
+              margin: '12px 0',
+              background: imageLoaded ? 'none' : '#e0e0e0',
+              minHeight: imageLoaded ? 0 : 200,
+              borderRadius: 4,
+              display: 'inline-block',
+              width: '100%',
+              animation: imageLoaded ? 'none' : 'pulse 1.4s ease-in-out infinite',
+            }}
+          >
+            <img
+              src={image}
+              alt=""
+              onLoad={() => setImageLoaded(true)}
+              style={{
+                maxWidth: '100%',
+                display: 'block',
+                opacity: imageLoaded ? 1 : 0,
+                transition: 'opacity 3s',
+              }}
+            />
+          </div>
         )}
 
         <FormGroup>
