@@ -1,4 +1,4 @@
-import { Checkbox, FormControlLabel, FormGroup, MenuItem, Select } from '@mui/material';
+import { Checkbox, FormControlLabel, FormGroup, MenuItem, Select, TextField } from '@mui/material';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { IQuestion, IQuestionHandlers, IResults } from '../types';
 
@@ -12,17 +12,23 @@ interface IQuestionProps {
 export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
   ({ questions, currentQuestionIndex, results, setCurrentQuestionIndex }, ref) => {
     const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+    const [textValue, setTextValue] = useState('');
     const [showResult, setShowResult] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [imageLoaded, setImageLoaded] = useState(false);
 
-    const { options, rightAnswers, image, solution } = questions[currentQuestionIndex];
+    const { options, rightAnswers, image, solution, textAnswers } = questions[currentQuestionIndex];
+    const isWordInput = !!textAnswers?.length;
 
     useEffect(() => {
       setImageLoaded(false);
     }, [image]);
 
     const randomOptions = useMemo(() => options.slice().sort(() => Math.random() - 0.5), [options]);
+
+    const normalize = (value: string) => value.trim().toLowerCase().replace(/ё/g, 'е');
+    const isTextCorrect = () =>
+      textAnswers!.some((answer) => normalize(answer) === normalize(textValue));
 
     const handleCheckboxChange = (id: string) => {
       setErrorMessage('');
@@ -37,6 +43,16 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
     const isSelected = (id: string) => selectedAnswers.includes(id);
 
     const handleSubmit = (): boolean | undefined => {
+      if (isWordInput) {
+        if (normalize(textValue) === '') {
+          setErrorMessage('Введите ответ');
+          setShowResult(false);
+          return;
+        }
+        setErrorMessage('');
+        setShowResult(true);
+        return isTextCorrect();
+      }
       if (selectedAnswers.length === 0) {
         setErrorMessage('Нужно выбрать хотя бы 1 вариант');
         setShowResult(false);
@@ -121,37 +137,60 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
           </div>
         )}
 
-        <FormGroup>
-          {randomOptions.map((option) => (
-            <FormControlLabel
-              key={option.id}
-              control={
-                <Checkbox
-                  checked={selectedAnswers.includes(option.id)}
-                  color="secondary"
-                  onChange={() => handleCheckboxChange(option.id)}
-                />
-              }
-              label={<span style={{ whiteSpace: 'pre-wrap' }}>{option.value}</span>}
-              style={{
-                color: showResult
-                  ? isSelected(option.id)
-                    ? isCorrect(option.id)
-                      ? 'green'
-                      : 'red'
-                    : ''
-                  : '',
-                border: '2px solid',
-                borderColor:
-                  showResult && !isSelected(option.id) && isCorrect(option.id)
-                    ? 'red'
-                    : 'transparent',
-                padding: '5px',
-                display: 'block',
+        {isWordInput ? (
+          <div style={{ marginTop: 8 }}>
+            <TextField
+              fullWidth
+              value={textValue}
+              onChange={(e) => {
+                setErrorMessage('');
+                setTextValue(e.target.value);
               }}
+              placeholder="Введите слово"
+              disabled={showResult}
+              color="secondary"
+              error={showResult && !isTextCorrect()}
             />
-          ))}
-        </FormGroup>
+            {showResult && (
+              <p style={{ marginTop: 8, color: isTextCorrect() ? 'green' : 'red' }}>
+                {isTextCorrect() ? 'Верно!' : 'Неверно.'} Правильный ответ:{' '}
+                {textAnswers!.join(' / ')}
+              </p>
+            )}
+          </div>
+        ) : (
+          <FormGroup>
+            {randomOptions.map((option) => (
+              <FormControlLabel
+                key={option.id}
+                control={
+                  <Checkbox
+                    checked={selectedAnswers.includes(option.id)}
+                    color="secondary"
+                    onChange={() => handleCheckboxChange(option.id)}
+                  />
+                }
+                label={<span style={{ whiteSpace: 'pre-wrap' }}>{option.value}</span>}
+                style={{
+                  color: showResult
+                    ? isSelected(option.id)
+                      ? isCorrect(option.id)
+                        ? 'green'
+                        : 'red'
+                      : ''
+                    : '',
+                  border: '2px solid',
+                  borderColor:
+                    showResult && !isSelected(option.id) && isCorrect(option.id)
+                      ? 'red'
+                      : 'transparent',
+                  padding: '5px',
+                  display: 'block',
+                }}
+              />
+            ))}
+          </FormGroup>
+        )}
         {errorMessage && (
           <p style={{ marginTop: 8, marginBottom: 16, color: 'red' }}>{errorMessage}</p>
         )}

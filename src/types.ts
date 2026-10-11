@@ -10,6 +10,9 @@ export interface IQuestion {
   options: IOption[];
   rightAnswers: string[];
   solution?: string;
+  /** Если задано — вопрос с вводом слова: вместо вариантов показывается текстовое поле,
+   *  ответ сверяется с этими формами (без учёта регистра, пробелов и ё/е). */
+  textAnswers?: string[];
 }
 
 export interface ITopic {
