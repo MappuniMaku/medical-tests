@@ -13,12 +13,15 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
   ({ questions, currentQuestionIndex, results, setCurrentQuestionIndex }, ref) => {
     const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
     const [textValue, setTextValue] = useState('');
+    const [assignments, setAssignments] = useState<Record<string, number>>({});
     const [showResult, setShowResult] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [imageLoaded, setImageLoaded] = useState(false);
 
-    const { options, rightAnswers, image, solution, textAnswers } = questions[currentQuestionIndex];
+    const { options, rightAnswers, image, solution, textAnswers, matchItems } =
+      questions[currentQuestionIndex];
     const isWordInput = !!textAnswers?.length;
+    const isMatch = !!matchItems?.length;
 
     useEffect(() => {
       setImageLoaded(false);
@@ -29,6 +32,25 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
     const normalize = (value: string) => value.trim().toLowerCase().replace(/ё/g, 'е');
     const isTextCorrect = () =>
       textAnswers!.some((answer) => normalize(answer) === normalize(textValue));
+
+    const toggleAssignment = (id: string) => {
+      setErrorMessage('');
+      setAssignments((prev) => {
+        // повторный тап — снять номер
+        if (prev[id]) {
+          const { [id]: _removed, ...rest } = prev;
+          return rest;
+        }
+        // иначе проставить наименьший свободный номер (1-й тап → 1, 2-й → 2 …)
+        const used = new Set(Object.values(prev));
+        for (let k = 1; k <= matchItems!.length; k++) {
+          if (!used.has(k)) return { ...prev, [id]: k };
+        }
+        return prev; // все номера уже проставлены
+      });
+    };
+    const isMatchCorrect = () =>
+      options.every((option) => (assignments[option.id] || 0) === (option.match || 0));
 
     const handleCheckboxChange = (id: string) => {
       setErrorMessage('');
@@ -52,6 +74,16 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
         setErrorMessage('');
         setShowResult(true);
         return isTextCorrect();
+      }
+      if (isMatch) {
+        if (!Object.values(assignments).some((n) => n > 0)) {
+          setErrorMessage('Проставьте номера соответствия');
+          setShowResult(false);
+          return;
+        }
+        setErrorMessage('');
+        setShowResult(true);
+        return isMatchCorrect();
       }
       if (selectedAnswers.length === 0) {
         setErrorMessage('Нужно выбрать хотя бы 1 вариант');
@@ -157,6 +189,55 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
                 {textAnswers!.join(' / ')}
               </p>
             )}
+          </div>
+        ) : isMatch ? (
+          <div style={{ marginTop: 8 }}>
+            <div style={{ marginBottom: 12 }}>
+              {matchItems!.map((item, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0' }}>
+                  <b>{i + 1}.</b>
+                  <span style={{ whiteSpace: 'pre-wrap' }}>{item}</span>
+                </div>
+              ))}
+            </div>
+            {randomOptions.map((option) => {
+              const cur = assignments[option.id] || 0;
+              const correctNum = option.match || 0;
+              const ok = showResult && cur === correctNum;
+              return (
+                <div
+                  key={option.id}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '5px 0' }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleAssignment(option.id)}
+                    disabled={showResult}
+                    style={{
+                      flex: '0 0 auto',
+                      width: 36,
+                      height: 36,
+                      borderRadius: 6,
+                      border: '2px solid',
+                      borderColor: showResult ? (ok ? 'green' : 'red') : '#9c27b0',
+                      background: 'transparent',
+                      color: showResult ? (ok ? 'green' : 'red') : 'inherit',
+                      fontSize: 16,
+                      fontWeight: 600,
+                      cursor: showResult ? 'default' : 'pointer',
+                    }}
+                  >
+                    {cur || '—'}
+                  </button>
+                  <span style={{ whiteSpace: 'pre-wrap' }}>{option.value}</span>
+                  {showResult && !ok && (
+                    <span style={{ color: 'green', marginLeft: 4, whiteSpace: 'nowrap' }}>
+                      → {correctNum || '—'}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <FormGroup>
