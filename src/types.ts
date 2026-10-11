@@ -9,6 +9,7 @@ export interface IQuestion {
   image?: string;
   options: IOption[];
   rightAnswers: string[];
+  solution?: string;
 }
 
 export interface ITopic {

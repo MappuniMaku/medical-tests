@@ -1,5 +1,5 @@
 import { Checkbox, FormControlLabel, FormGroup, MenuItem, Select } from '@mui/material';
-import { forwardRef, useImperativeHandle, useMemo, useState, useEffect } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { IQuestion, IQuestionHandlers, IResults } from '../types';
 
 interface IQuestionProps {
@@ -16,7 +16,7 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
     const [errorMessage, setErrorMessage] = useState('');
     const [imageLoaded, setImageLoaded] = useState(false);
 
-    const { options, rightAnswers, image } = questions[currentQuestionIndex];
+    const { options, rightAnswers, image, solution } = questions[currentQuestionIndex];
 
     useEffect(() => {
       setImageLoaded(false);
@@ -154,6 +154,23 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
         </FormGroup>
         {errorMessage && (
           <p style={{ marginTop: 8, marginBottom: 16, color: 'red' }}>{errorMessage}</p>
+        )}
+        {showResult && solution && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: '10px 12px',
+              borderRadius: 4,
+              backgroundColor: '#f1f8e9',
+              borderLeft: '4px solid #689f38',
+              whiteSpace: 'pre-wrap',
+              lineHeight: 1.4,
+            }}
+          >
+            <strong>Решение</strong>
+            {'\n'}
+            {solution}
+          </div>
         )}
       </div>
     );
