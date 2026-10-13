@@ -18,10 +18,13 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
     const [errorMessage, setErrorMessage] = useState('');
     const [imageLoaded, setImageLoaded] = useState(false);
 
-    const { options, rightAnswers, image, solution, textAnswers, matchItems } =
+    const { options, rightAnswers, image, solution, textAnswers, matchItems, sequence } =
       questions[currentQuestionIndex];
     const isWordInput = !!textAnswers?.length;
     const isMatch = !!matchItems?.length;
+    const isSequence = !!sequence;
+    // число слотов для нумерации: пункты соответствия или все варианты (последовательность)
+    const slotCount = matchItems?.length ?? options.length;
 
     useEffect(() => {
       setImageLoaded(false);
@@ -43,7 +46,7 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
         }
         // иначе проставить наименьший свободный номер (1-й тап → 1, 2-й → 2 …)
         const used = new Set(Object.values(prev));
-        for (let k = 1; k <= matchItems!.length; k++) {
+        for (let k = 1; k <= slotCount; k++) {
           if (!used.has(k)) return { ...prev, [id]: k };
         }
         return prev; // все номера уже проставлены
@@ -75,9 +78,9 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
         setShowResult(true);
         return isTextCorrect();
       }
-      if (isMatch) {
+      if (isMatch || isSequence) {
         if (!Object.values(assignments).some((n) => n > 0)) {
-          setErrorMessage('Проставьте номера соответствия');
+          setErrorMessage(isSequence ? 'Проставьте порядок' : 'Проставьте номера соответствия');
           setShowResult(false);
           return;
         }
@@ -190,16 +193,18 @@ export const QuestionComponent = forwardRef<IQuestionHandlers, IQuestionProps>(
               </p>
             )}
           </div>
-        ) : isMatch ? (
+        ) : isMatch || isSequence ? (
           <div style={{ marginTop: 8 }}>
-            <div style={{ marginBottom: 12 }}>
-              {matchItems!.map((item, i) => (
-                <div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0' }}>
-                  <b>{i + 1}.</b>
-                  <span style={{ whiteSpace: 'pre-wrap' }}>{item}</span>
-                </div>
-              ))}
-            </div>
+            {isMatch && (
+              <div style={{ marginBottom: 12 }}>
+                {matchItems!.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0' }}>
+                    <b>{i + 1}.</b>
+                    <span style={{ whiteSpace: 'pre-wrap' }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            )}
             {randomOptions.map((option) => {
               const cur = assignments[option.id] || 0;
               const correctNum = option.match || 0;
